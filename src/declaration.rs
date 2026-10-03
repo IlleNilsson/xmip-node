@@ -230,8 +230,14 @@ mod tests {
         let directory = scratch("held");
         // The name is whatever the operator called the node, and nothing here
         // reads anything out of it (ADR-0053).
-        let name = "xmip-playground-orders-node-edge-01";
-        let declaration = Declaration::new(name, "xmip:///orders/node/edge-01", Purpose::Test);
+        let cluster = configure::fixture::test_cluster();
+        let name = format!(
+            "xmip-playground-{}-node-{}",
+            cluster.name,
+            cluster.node(0).name
+        );
+        let location = cluster.node_scope(0);
+        let declaration = Declaration::new(&name, &location, Purpose::Test);
 
         let declared = declaration.declare_in(&directory).expect("declared");
         let file = declared.file().to_path_buf();
@@ -244,7 +250,7 @@ mod tests {
         );
         assert!(text.contains(&format!("name = \"{name}\"")), "{text}");
         assert!(
-            text.contains("location = \"xmip:///orders/node/edge-01\""),
+            text.contains(&format!("location = \"{location}\"")),
             "{text}"
         );
         assert!(text.contains("purpose = \"test\""), "{text}");
@@ -298,7 +304,8 @@ mod tests {
 
     #[test]
     fn what_else_a_process_says_follows_the_six_and_takes_none_of_their_keys() {
-        let declaration = Declaration::new("xmip-playground-node", "xmip:///C1", Purpose::Test)
+        let scope = configure::fixture::test_cluster().scope();
+        let declaration = Declaration::new("xmip-playground-node", &scope, Purpose::Test)
             .with("stress", "calm")
             .and_then(|said| said.with("rounds", "0"))
             .expect("two bare keys");

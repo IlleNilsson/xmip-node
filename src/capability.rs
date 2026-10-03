@@ -20,7 +20,7 @@
 //! A declaration is said in two forms, each written and read here and
 //! nowhere else (open problem 25): the **evidence** a node publishes about
 //! itself — `declares receiving,sending; online; …` — and the **entry** a run
-//! lists it by — `edge-01=receiving+sending`, or the bare name for a node
+//! lists it by — `<name>=receiving+sending`, or the bare name for a node
 //! that declares no role. The runtime's library forwards both readings to the
 //! surfaces (`xmip_capability_published_v1`, `xmip_capability_entry_v1`,
 //! `xmip_operate.h` section 7), so `Xmip.Surface` keeps no parse of its own.
@@ -180,7 +180,7 @@ impl Capability {
         Ok(Self::of(&roles).with_online(evidence.contains("; online;")))
     }
 
-    /// The node as a run lists it: `edge-01=receiving+sending`, or the bare
+    /// The node as a run lists it: `<name>=receiving+sending`, or the bare
     /// name when it declares no role. It says nothing of the online
     /// capability, which a run lists apart.
     #[must_use]
@@ -309,19 +309,19 @@ mod tests {
 
     #[test]
     fn an_entry_names_the_node_and_what_it_was_started_with() {
+        let cluster = configure::fixture::test_cluster();
+        let [one, two, three] = [0, 1, 2].map(|place| cluster.node(place).name.as_str());
         let both = Capability::of(&[NodeRole::Sending, NodeRole::Receiving]);
-        assert_eq!(both.entry("edge-01"), "edge-01=receiving+sending");
-        assert_eq!(Capability::none().entry("edge-02"), "edge-02");
+        assert_eq!(both.entry(one), format!("{one}=receiving+sending"));
+        assert_eq!(Capability::none().entry(two), two);
         assert_eq!(
-            Capability::from_entry(" edge-01 =receiving+sending"),
-            ("edge-01", Ok(both))
+            Capability::from_entry(&format!(" {one} =receiving+sending")),
+            (one, Ok(both))
         );
-        assert_eq!(
-            Capability::from_entry("edge-02"),
-            ("edge-02", Ok(Capability::none()))
-        );
-        let (name, refused) = Capability::from_entry("edge-03=relay");
-        assert_eq!(name, "edge-03");
+        assert_eq!(Capability::from_entry(two), (two, Ok(Capability::none())));
+        let relay = format!("{three}=relay");
+        let (name, refused) = Capability::from_entry(&relay);
+        assert_eq!(name, three);
         assert!(refused.expect_err("relay").starts_with("REFUSED"));
     }
 }

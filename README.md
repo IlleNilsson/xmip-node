@@ -29,7 +29,7 @@ forwarded the same way.
 `Capability` is what a node declares — its roles and whether it may assume
 the internet — and the two forms it is said in: the evidence a node
 publishes about itself (`evidence`, `from_evidence`) and the entry a run
-lists it by (`entry`, `from_entry`: `edge-01=receiving+sending`). The Playground
+lists it by (`entry`, `from_entry`: `R1=receiving+sending`). The Playground
 declares through it and the surfaces read through it
 (`xmip_capability_published_v1`, `xmip_capability_entry_v1`).
 
