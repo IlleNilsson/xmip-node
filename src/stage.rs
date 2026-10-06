@@ -57,7 +57,7 @@ impl Stage {
     }
 
     /// Whether an operator may pause the stage: a Receive or a Send Location
-    /// can be held; an Xmip Process runs off a subscription, and an operator
+    /// can be held; a Work Process runs off a subscription, and an operator
     /// pauses the Location that feeds it, not the Process itself.
     #[must_use]
     pub const fn pausable(self) -> bool {
@@ -65,12 +65,12 @@ impl Stage {
     }
 
     /// What a thing configured at the stage is called: a receive location,
-    /// an Xmip Process, a send location (ADR-0027 clause 4).
+    /// a Work Process, a send location (ADR-0027 clause 4).
     #[must_use]
     pub const fn location(self) -> &'static str {
         match self {
             Self::Receive => "receive location",
-            Self::Process => "xmip process",
+            Self::Process => "work process",
             Self::Send => "send location",
         }
     }
@@ -92,7 +92,7 @@ mod tests {
         assert_eq!(Stage::ALL.map(Stage::pausable), [true, false, true]);
         assert_eq!(
             Stage::ALL.map(Stage::location),
-            ["receive location", "xmip process", "send location"]
+            ["receive location", "work process", "send location"]
         );
     }
 }
